@@ -1,4 +1,6 @@
-## Linear Model for Classification
+# Classificazione
+
+## Modelli lineari per la Classificazione
 
 Discuteremo una classe di modelli di classificazione chiamati modelli lineari per la classificazione. Il problema della classificazione consiste nel prendere un vettore di input x, e assegnarlo a una delle K classi, dove K è un numero finito. Nella maggior parte degli scenari, tali classi verrano considerate disgiunte, così che un vettore x potrà essere classificato in una e una sola classe.
 
@@ -223,3 +225,73 @@ t_n =
 \end{cases}
 \end{equation}
 $
+
+### Conclusioni
+
+Come per la regressione ai minimi quadrati, anche in questo caso i modelli lineari peccano nel quantificare la confidenza delle predizioni.
+
+## Classificazione Bayesiana
+
+Introduciamo ora un approccio generativo e porterà (attraverso Bayes) a una misura di incertezza delle predizioni più accurata. Preveremo a trovare una connessione tra visioni probabilistiche e geometriche.
+
+### Modelli probabilistici generativi
+
+Consideriamo un problema a due classi (k = 2), possiamo calcolare la probabilità a posteriori di una classe $\mathbf{C}_1$ come:
+
+$
+\begin{equation}  
+p(\mathbf{C}_1 | \mathbf{x}) = \frac{p(\mathbf{x} | \mathbf{C}_1) p(\mathbf{C}_1)}{p(\mathbf{x | \mathbf{C}_1}) p(\mathbf{C}_1) + p(\mathbf{x | \mathbf{C}_2}) p(\mathbf{C}_2)}
+\end{equation} \\
+\begin{equation}  
+= \frac{1}{1 + exp(-a)} = \sigma(a(x))
+\end{equation} \\
+\begin{equation}
+per a = ln \frac{p(\mathbf{x | \mathbf{C}_1}) p(\mathbf{C}_1)}{p(\mathbf{x | \mathbf{C}_2}) p(\mathbf{C}_2)}
+\end{equation}
+$
+
+la funzione $\sigma(a)$ è la **funzione logistica**. Ed è molto importanti in tanti modelli di classificazione, come in reti neurali.
+
+![Funzione logistica](funzione_logistica.png "logistic function")
+
+In casi più generali, con k > 2, possiamo scrivere:
+
+$
+\begin{equation}
+p(\mathbf{C}_k | \mathbf{x}) = \frac{exp(a_k)}{\sum_j exp(a_j)}
+\end{equation}
+$
+
+Questa formula è chiamata **funzione softmax**, o esponenziale normalizzato. Vediamo il comportamento per un determinato valore di $\mathbf{a}_k$.
+
+Possiamo assumere che le densità class-conditional (likelihood) siano delle Gaussiane con le stesse matrice di covarianza ($\Sigma$). Ecco la densità per la classe $C_k$:
+
+$
+\begin{equation}
+p(\mathbf{x} | \mathbf{C}_k) = \frac{1}{(2\pi)^{D/2} |\mathbf{\Sigma}|^{-1}} exp \left\{ -\frac{1}{2} (\mathbf{x} - \mathbf{\mu}_k)^T \mathbf{\Sigma}^{-1} (\mathbf{x} - \mathbf{\mu}_k) \right\}
+\end{equation}
+$
+
+Per il momento consiedriamo k = 1. Ottniamo quindi la seguente probabilità a posteriori:
+
+$
+\begin{equation}
+p(\mathbf{C}_1 | \mathbf{x}) = \sigma(\mathbf{w}^T \mathbf{x} + w_0)
+\end{equation}
+$
+
+dove $w = \mathbf{\Sigma}^{-1} (\mathbf{\mu}_1 - \mathbf{\mu}_2)$ e $w_0 = -\frac{1}{2} \mathbf{\mu}_1^T \mathbf{\Sigma}^{-1} \mathbf{\mu}_1 + \frac{1}{2} \mathbf{\mu}_2^T \mathbf{\Sigma}^{-1} \mathbf{\mu}_2 + ln \frac{p(\mathbf{C}_1)}{p(\mathbf{C}_2)}$.
+
+I termini quadratici di x si spariscono, in quando le matrici di covarianza sono in comune. Questo garantisce che i confini delle regioni di decisioni siano lineari.
+
+Per k generico, usiamo softmax, invece del sigmoide:
+
+$
+\begin{equation}
+a_k(\mathbf{x}) = \mathbf{w}_k^T \mathbf{x} + w_{k0}
+\end{equation}
+$
+
+dove $w_k = \mathbf{\Sigma}^{-1} \mathbf{\mu}_k$ e $w_{k0} = -\frac{1}{2} \mathbf{\mu}_k^T \mathbf{\Sigma}^{-1} \mathbf{\mu}_k + ln p(\mathbf{C}_k)$.
+
+I limiti di decisione risultanti saranno in corrisspondenza delle regioni in cui le probabilità a posteriori sono uguali. Il che corrisponde al rateo minimo di misclassificazione (Una funzione lineare di x).
