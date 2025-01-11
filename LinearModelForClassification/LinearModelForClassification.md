@@ -295,3 +295,60 @@ $
 dove $w_k = \mathbf{\Sigma}^{-1} \mathbf{\mu}_k$ e $w_{k0} = -\frac{1}{2} \mathbf{\mu}_k^T \mathbf{\Sigma}^{-1} \mathbf{\mu}_k + ln p(\mathbf{C}_k)$.
 
 I limiti di decisione risultanti saranno in corrisspondenza delle regioni in cui le probabilità a posteriori sono uguali. Il che corrisponde al rateo minimo di misclassificazione (Una funzione lineare di x).
+
+### Modelli probabilistici discriminativi
+
+Abbiamo visto che la probabilità a posteriori di un problema a due classi può essere scritta come la funzione sigmoide di una funzione lineare di x e, analogamente, usando la softmax per in un problema a più classi. In questo casi si parla di modelli generativi, perché generano campioni di x, campionando la probabilità marginale p(x).
+
+Un altro approccio è usare direttamente le forme funzionali dei modelli lineari generalizzati per discriminare. Abbiamo sviluppato i classificatori per lavorare direttamten con l'input originale x, ma tutto ciò che abbiamo derivato funziona ugualmente bene se usiamo un vettore di funzioni base $\phi(x)$ dell'input originale. I confini risultanti sono lineari nello spazione delle feature $\phi(x)$, ma non nello spazio originale x.
+
+![alt text](fixed_basis_functions.png "fixed_basis_functions")
+
+Quindi qeusto ci consente di avere sicuramente dei confini lineari.
+
+#### Reegressione logistica
+
+La probabilità a posteriori di una classe $\mathbf{C}_1$ può essere scritta come la funzione sigmoide di una funzione lineare di $\phi$:
+
+$
+\begin{equation}
+p(\mathbf{C}_1 | \phi) = \sigma(\mathbf{w}^T \phi)
+\end{equation}
+$
+
+Questa forma è chiamata **regressione logistica**.
+Per uno spazio delle feature di dimensione M, questo modello ha M parametri (quindi w ha lunghezza M). Il modell generativo richiederebbe 2M parametri per la media. più M(M+1)/2 parametri per la matrice di covarianza. Possiamo usare la massima Likelihood per fittare i parametri del modello. In questo caso è utile utilizzare la derivate del sigmoide:
+
+$
+\begin{equation}
+\frac{d\sigma(a)}{da} = \sigma(a)(1 - \sigma(a))
+\end{equation}
+$
+
+Prendiamo un dataset $D = {\phi_n, t_n}$, dove $t_n \in {0, 1}$ e $\phi_n = \phi(x)$. La Likelihood è data da:
+
+$
+\begin{equation}
+p(\mathbf{t} | \mathbf{w}) = \prod_{n=0}^N y_n^{t_n}\{1-y_n\}^{1-t_n}
+\end{equation}
+$
+
+dove $y_n = p(\mathbf{C}_1 | \phi_n) = \sigma(\mathbf{w}^T \phi_n)$ e $t = (t_1,t_2,..,t_N)^T$ è il target.
+
+Per la funzione di errore useremo la likelihood logaritmica negativa:
+
+$
+\begin{equation}
+E(\mathbf{w}) = -ln p(\mathbf{t} | \mathbf{w}) = - \sum_{n=1}^N \{t_n ln y_n + (1-t_n) ln(1-y_n)\}
+\end{equation}
+$
+
+Osservando le equazioni scritte finora (come abbiamo definito $y_n$ e il sigmoide derivato),
+
+$
+\begin{equation}
+\frac{\partial E}{\partial w_i} = \sum_{n=1}^N (y_n - t_n) \phi_{n}
+\end{equation}
+$
+
+Otteniamo la stessa forma ottenuta per l'apprendimento sequenziale per la regressione lineare, con funzion base $\phi(x)$ fissate. Stiamo cercando di regeredire il target $t_n$ dalle funzioni di base.
