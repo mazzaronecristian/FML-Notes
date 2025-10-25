@@ -306,7 +306,7 @@ Un altro approccio è usare direttamente le forme funzionali dei modelli lineari
 
 Quindi qeusto ci consente di avere sicuramente dei confini lineari.
 
-#### Reegressione logistica
+#### Regressione logistica
 
 La probabilità a posteriori di una classe $\mathbf{C}_1$ può essere scritta come la funzione sigmoide di una funzione lineare di $\phi$:
 
